@@ -1,81 +1,102 @@
 # AI-Driven Network Traffic Analysis and Intrusion Detection System
 
-MegaMinds IT Services — Cybersecurity & Network Security Research Intern Assessment
+**MegaMinds IT Services — Cybersecurity & Network Security Research Intern Assessment**
 
 ## Overview
 
-This prototype ingests simulated network-flow traffic, extracts security-relevant features, applies explainable rule-based detection, and combines the rules with an Isolation Forest anomaly detector. The output is an analyst-oriented alert containing the suspected attack, severity, confidence, and supporting reasons.
+This project is a controlled, AI-driven network traffic analysis and intrusion detection prototype developed for the MegaMinds Cybersecurity & Network Security Research Intern assessment.
 
-The traffic generator creates controlled examples for:
-- Normal/benign traffic
-- Port scanning/reconnaissance
-- DoS/flooding
-- Brute-force activity
-- An ambiguous/borderline case
+The system analyzes simulated network-flow data, extracts security-relevant features, applies explainable rule-based detection, and uses an Isolation Forest machine-learning model to identify anomalous traffic.
 
-> The traffic is simulated locally for a safe, reproducible assessment environment. No attacks are launched against real systems.
+The final detection pipeline combines rule-based evidence and ML anomaly detection to produce analyst-oriented alerts containing:
+
+- Detected activity
+- Detection method
+- Severity
+- Confidence
+- Supporting reason
+- ML anomaly score
+
+All traffic used in this project is generated locally in a controlled environment. No attacks are launched against real systems or external infrastructure.
+
+---
+
+## Key Features
+
+- Simulated network traffic generation
+- Normal/benign traffic modeling
+- Port-scan detection
+- DoS/flooding detection
+- Brute-force detection
+- Ambiguous/borderline traffic scenario
+- Rule-based detection
+- Isolation Forest anomaly detection
+- Hybrid rule + ML detection
+- Alert severity and confidence
+- Explainable detection reasons
+- Accuracy, precision, recall and F1 evaluation
+- Confusion matrix
+- Scenario-level evaluation
+- False-positive analysis
+- Detection-method analysis
+- Streamlit analyst dashboard
+- Batch performance and scalability testing
+
+---
+
+## Detection Scenarios
+
+The traffic generator creates five controlled scenarios:
+
+| Scenario | Description |
+|---|---|
+| Normal | Simulated benign network activity |
+| Port Scan | Reconnaissance involving connections to multiple destination ports |
+| DoS | High-volume traffic intended to represent flooding behavior |
+| Brute Force | Repeated SSH authentication attempts with failed authentication indicators |
+| Ambiguous | Bursty traffic representing a legitimate backup/update activity that may resemble anomalous behavior |
+
+The ambiguous scenario is intentionally included to evaluate how the system behaves when unusual traffic is not necessarily malicious.
+
+---
 
 ## Architecture
 
-Traffic generator -> Feature engineering -> Rule engine + Isolation Forest -> Hybrid decision -> Analyst alerts + metrics
-
-## Setup
-
-```bash
-python -m venv .venv
-# Windows: .venv\\Scripts\\activate
-# Linux/macOS: source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-## Run
-
-Generate the traffic dataset:
-
-```bash
-python data/generate_traffic.py
-```
-
-Train the anomaly model:
-
-```bash
-python src/train_model.py
-```
-
-Run detection:
-
-```bash
-python src/detect.py --input data/raw/traffic.csv --output results/alerts.csv
-```
-
-Evaluate the labelled scenarios:
-
-```bash
-python src/evaluate.py
-```
-
-Run the analyst dashboard:
-
-```bash
-streamlit run src/dashboard.py
-```
-
-## Detection approach
-
-### Rule layer
-
-- Port scan: unusually high number of unique destination ports in a short time window.
-- DoS/flood: unusually high packets/sec and bytes/sec from a source.
-- Brute force: repeated short authentication connections with a high failed-attempt indicator.
-
-### ML layer
-
-Isolation Forest is trained on normal traffic and identifies flows that differ from the learned baseline. The hybrid layer uses rule evidence as the primary explainable signal and ML anomaly evidence as supporting context.
-
-## Evaluation
-
-The evaluation script reports accuracy, precision, recall, F1, confusion matrix values, and representative false-positive/false-negative or ambiguous examples where available.
-
-## Limitations
-
-This is a controlled flow-level prototype. It does not reproduce the full packet payload, encrypted application context, distributed attacks, or the throughput characteristics of an enterprise sensor. Thresholds are dataset-specific and should be calibrated on representative production traffic.
+```text
+                    +----------------------+
+                    |  Traffic Generator   |
+                    |  Simulated Scenarios |
+                    +----------+-----------+
+                               |
+                               v
+                    +----------------------+
+                    | Feature Engineering  |
+                    +----------+-----------+
+                               |
+                 +-------------+-------------+
+                 |                           |
+                 v                           v
+        +----------------+          +------------------+
+        |  Rule Engine   |          | Isolation Forest |
+        | Explainable    |          | ML Anomaly Model |
+        +-------+--------+          +---------+--------+
+                |                             |
+                +-------------+---------------+
+                              |
+                              v
+                    +----------------------+
+                    |   Hybrid Detection   |
+                    +----------+-----------+
+                               |
+                 +-------------+-------------+
+                 |                           |
+                 v                           v
+        +------------------+       +------------------+
+        | Analyst Alerts   |       |    Evaluation    |
+        | Severity/Reason  |       | Metrics/Results  |
+        +--------+---------+       +------------------+
+                 |
+                 v
+        +----------------------+
+        | Streamlit Dashboard  |
+        +----------------------+
